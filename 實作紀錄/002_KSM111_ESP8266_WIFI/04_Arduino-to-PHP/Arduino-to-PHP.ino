@@ -41,7 +41,7 @@ KSM111_ESP8266 wifi(KSRobot_WIFI_RX,KSRobot_WIFI_TX,CE_PIN);
 
 String ssid="jash.net-G-WEP";
 String pass="jashasd700502";
-String IP = "192.168.104.3";
+String IP = "192.168.104.5";
 String Path = "val.php?string=";
 int value=100;
 
@@ -74,6 +74,7 @@ void loop()
 
 	// 準備要GET的字串
 	// HTTP/1.1
+        value+=1;
         String cmd;
 	String getstr = "GET /"+Path+String(value)+" HTTP/1.1\r\nHost:"+IP+":8080\r\n\r\n";//
 	// 發送指定長度的數據
@@ -83,20 +84,23 @@ void loop()
 	wifi.println(cmd);
 	//Serial.println("length: "+cmd);
 	delay(1000);
-
+                 if (wifi.available()) {
+                  Serial.write("php:"+wifi.read());
+                }       
   	// 長度的數據傳送成功，會返回 ">"，然後開始傳輸通訊埠數據
 	if(wifi.find(">")){
 		Serial.println("> "+getstr);
+                //wifi.println(getstr);
 	}
 	else{
 		// 關閉連線
+
 		wifi.println("AT+CIPCLOSE");
 		Serial.println("AT+CIPCLOSE  connection closed!\r\n\r\n");
 		delay(2000);
+                wifi.startclient("TCP",IP,"8080");
 		return;
 	} 
-	wifi.println(getstr);
-	delay(2000);
 
 }
 
